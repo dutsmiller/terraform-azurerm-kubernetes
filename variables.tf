@@ -185,6 +185,24 @@ variable "enable_kube_dashboard" {
   default     = false
 }
 
+variable "load_balancer_sku" {
+  description = "SKU of the Load Balancer"
+  type        = string
+  default     = "Standard"
+}
+
+variable "load_balancer_profile" {
+  description = "Standard Load Balancer profile (n/a to Basic SKU)"
+  type        = object({
+                  outbound_ports_allocated  = number
+                  idle_timeout_in_minutes   = number
+                  managed_outbound_ip_count = number
+                })
+  default     = { outbound_ports_allocated  = 0
+                  idle_timeout_in_minutes   = 30
+                  managed_outbound_ip_count = 1 }
+}
+
 variable "acr_pull_access" {
   description = "map of ACR ids to allow AcrPull"
   type        = map(string)

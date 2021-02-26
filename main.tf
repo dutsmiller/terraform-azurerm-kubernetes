@@ -49,7 +49,18 @@ resource "azurerm_kubernetes_cluster" "aks" {
   kubernetes_version = var.kubernetes_version
   
   network_profile {
-    network_plugin = var.network_plugin
+    network_plugin    = var.network_plugin
+    load_balancer_sku = var.load_balancer_sku
+
+    dynamic "load_balancer_profile" {
+      for_each = (var.load_balancer_sku == "Standard" ? [1] : [])
+      content {
+        outbound_ports_allocated  = var.load_balancer_profile.outbound_ports_allocated
+        idle_timeout_in_minutes   = var.load_balancer_profile.idle_timeout_in_minutes
+        managed_outbound_ip_count = var.load_balancer_profile.managed_outbound_ip_count
+      }
+    }
+
   }
 
   default_node_pool {
@@ -71,7 +82,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   dynamic "windows_profile" {
-    for_each = var.enable_windows_node_pools ? [1] : []
+    for_each = (var.enable_windows_node_pools ? [1] : [])
     content {
       admin_username = var.windows_profile_admin_username
       admin_password = var.windows_profile_admin_password
